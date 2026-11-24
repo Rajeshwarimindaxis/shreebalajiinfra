@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Enquiry - Shree Balaji Infra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/images/f71306_favicon.ico">
+  <link rel="stylesheet" href="assets/css/catalog_new.css">
+  <link rel="stylesheet" href="assets/css/catalog.css">
+  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #ffffff;
+      color: #333333;
+    }
+    .details-popup {
+      background: #fdfdfd;
+      border: 1px solid #e2e2e2;
+      border-radius: 8px;
+      padding: 15px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .pop-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .pop-col1 {
+      flex: 1 1 260px;
+      text-align: center;
+      background: #fff;
+      padding: 12px;
+      border: 1px solid #eee;
+      border-radius: 6px;
+    }
+    .pop-col2 {
+      flex: 1 1 320px;
+    }
+    .pop-col1 img {
+      max-width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #f0f0f0;
+    }
+    .prod-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1b97d1;
+      margin: 10px 0 6px;
+    }
+    .prod-price {
+      font-size: 15px;
+      color: #e62319;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .prod-moq {
+      font-size: 13px;
+      color: #666;
+    }
+    .form-title {
+      font-size: 17px;
+      font-weight: 700;
+      background: #1b97d1;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .f-group {
+      margin-bottom: 12px;
+    }
+    .f-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #444;
+    }
+    .f-group input, .f-group select, .f-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .f-group input:focus, .f-group select:focus, .f-group textarea:focus {
+      border-color: #1b97d1;
+      outline: none;
+    }
+    .f-row {
+      display: flex;
+      gap: 10px;
+    }
+    .submit-btn {
+      background: #e62319;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 24px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover {
+      background: #cc1e15;
+    }
+    .success-alert {
+      display: none;
+      text-align: center;
+      padding: 25px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 6px;
+    }
+    .success-alert h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="details-popup">
+    <div class="pop-flex">
+      <!-- Left Column: Product Summary -->
+      <div class="pop-col1">
+        <img id="prodImg" src="assets/images/bac770_12577-comp-image.png" alt="Product Image">
+        <div class="prod-title" id="prodTitle">Industrial Roofing Solution</div>
+        <div class="prod-price" id="prodPrice">Price: ₹ 95 / Kilogram</div>
+        <div class="prod-moq" id="prodMOQ">MOQ: 500 Kilogram</div>
+      </div>
+
+      <!-- Right Column: Enquiry Form -->
+      <div class="pop-col2">
+        <div class="form-title">Get a Quick Quote</div>
+
+        <div id="enquirySuccessMsg" class="success-alert">
+          <i class="fa fa-check-circle" style="font-size: 38px; color: #2e7d32; margin-bottom: 8px;"></i>
+          <h3>Thank You!</h3>
+          <p>Your Enquiry has been sent successfully.</p>
+          <p style="font-size: 13px; color: #555;">Our sales team will get in touch with you shortly.</p>
+        </div>
+
+        <form id="enquiryPopupForm" onsubmit="return handleFormSubmit(event)">
+          <div class="f-row">
+            <div class="f-group" style="flex: 1;">
+              <label>Quantity</label>
+              <input type="number" id="enqQty" min="1" placeholder="Quantity" value="500" required>
+            </div>
+            <div class="f-group" style="width: 120px;">
+              <label>Unit</label>
+              <select id="enqUnit">
+                <option value="Kilogram">Kilogram</option>
+                <option value="Square Feet">Sq Feet</option>
+                <option value="Meter">Meter</option>
+                <option value="Piece">Piece</option>
+                <option value="Ton">Ton</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="f-group">
+            <label>Your Name *</label>
+            <input type="text" id="enqName" placeholder="Full Name" required>
+          </div>
+
+          <div class="f-group">
+            <label>Mobile Number *</label>
+            <input type="tel" id="enqMobile" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+          </div>
+
+          <div class="f-group">
+            <label>Email Address *</label>
+            <input type="email" id="enqEmail" placeholder="name@company.com" required>
+          </div>
+
+          <div class="f-group">
+            <label>Requirement Details</label>
+            <textarea id="enqDetails" rows="2" placeholder="Kindly send quotation including delivery to Pune/Maharashtra...">I am interested. Kindly send the quotation for the same.</textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Send Enquiry</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/catalog_common_new.js"></script>
+  <script>
+    // Product details catalog
+    var productCatalog = {
+      "4059540": { title: "Blue Color Coated Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/8ecf2d_blue-color-coated-roofing-sheet-1756533309-8299191.jpeg" },
+      "4059541": { title: "Yellow Color Coated Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/ad1db9_yellow-color-coated-roofing-sheet-1756533634-8299221.jpeg" },
+      "4059542": { title: "White Color Coated Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/72fe0f_white-color-coated-roofing-sheet-1756533733-8299229.jpeg" },
+      "4059543": { title: "Green Color Coated Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/a038d1_green-color-coated-roofing-sheet-1756533523-8299216.jpeg" },
+      "4059544": { title: "Red Color Coated Curved Roofing Sheet", price: "₹ 110 / Kilogram", moq: "300 Kilogram", unit: "Kilogram", img: "assets/images/3d51eb_red-color-coated-curved-roofing-sheet-1756534023-8299250.jpeg" },
+      "4059546": { title: "PPGI Hi Rib Profile Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/bdfdf8_color-coated-high-rib-profile-sheet-1756535170-8299339.jpeg" },
+      "4059547": { title: "Color Coated Metal Roofing Sheet", price: "₹ 95 / Kilogram", moq: "500 Kilogram", unit: "Kilogram", img: "assets/images/d70dd1_red-color-coated-roofing-sheet-1756532357-8299162.jpeg" },
+      "4059582": { title: "Barge Board Flashing", price: "₹ 120 / Meter", moq: "50 Meter", unit: "Meter", img: "assets/images/418f77_roof-ridge-flashing-1757479529-8321815.jpeg" },
+      "4059583": { title: "Corner Flashing", price: "₹ 115 / Meter", moq: "50 Meter", unit: "Meter", img: "assets/images/418f77_roof-ridge-flashing-1757479529-8321815.jpeg" },
+      "4059584": { title: "PUF Wall Panels", price: "₹ 850 / Sq. Meter", moq: "100 Sq. Meter", unit: "Square Feet", img: "assets/images/8ecf2d_blue-color-coated-roofing-sheet-1756533309-8299191.jpeg" }
+    };
+
+    var params = new URLSearchParams(window.location.search);
+    var slno = params.get('product_slno');
+    var prodName = params.get('product');
+
+    if (slno && productCatalog[slno]) {
+      var p = productCatalog[slno];
+      document.getElementById('prodTitle').innerText = p.title;
+      document.getElementById('prodPrice').innerText = "Price : " + p.price;
+      document.getElementById('prodMOQ').innerText = "MOQ : " + p.moq;
+      document.getElementById('enqUnit').value = p.unit;
+      if (p.img) document.getElementById('prodImg').src = p.img;
+    } else if (prodName) {
+      document.getElementById('prodTitle').innerText = decodeURIComponent(prodName);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      var name = document.getElementById('enqName').value.trim();
+      var mobile = document.getElementById('enqMobile').value.trim();
+      var email = document.getElementById('enqEmail').value.trim();
+
+      if (!name || !mobile || !email) {
+        alert('Please fill out all required fields.');
+        return false;
+      }
+
+      document.getElementById('enquiryPopupForm').style.display = 'none';
+      document.getElementById('enquirySuccessMsg').style.display = 'block';
+
+      setTimeout(function () {
+        if (window.parent && window.parent.jQuery && window.parent.jQuery.fancybox) {
+          window.parent.jQuery.fancybox.close();
+        }
+      }, 3000);
+
+      return false;
+    }
+  </script>
+</body>
+</html>
