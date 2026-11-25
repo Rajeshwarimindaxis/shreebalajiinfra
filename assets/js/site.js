@@ -361,6 +361,7 @@
         if (scrollY > (navTop > 0 ? navTop : 40)) {
           if (!navbar.classList.contains('sb-navbar-sticky')) {
             navbar.classList.add('sb-navbar-sticky');
+            spacer.style.height = navbar.offsetHeight + 'px';
             spacer.classList.add('is-active');
           }
         } else {
@@ -623,3 +624,221 @@
 
 })();
 
+
+  /* ==========================================================================
+     UNIFIED MOBILE NAVIGATION & DROPDOWN CONTROLLER
+     ========================================================================== */
+  (function initGlobalMobileNav() {
+    function setupMobileNav() {
+      var toggleBtn = document.getElementById('sbNavToggle');
+      var menu = document.getElementById('sbNavMenu');
+      if (toggleBtn && menu) {
+        toggleBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          menu.classList.toggle('is-open');
+          menu.classList.toggle('sb-open');
+        });
+      }
+
+      // Close menu when tapping outside on mobile
+      document.addEventListener('click', function (e) {
+        if (menu && (menu.classList.contains('is-open') || menu.classList.contains('sb-open'))) {
+          if (!menu.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+            menu.classList.remove('is-open');
+            menu.classList.remove('sb-open');
+          }
+        }
+      });
+
+      // Expandable mega dropdown on mobile
+      var dropdownItems = document.querySelectorAll('.sb-has-dropdown > a');
+      dropdownItems.forEach(function (dropLink) {
+        dropLink.addEventListener('click', function (e) {
+          if (window.innerWidth <= 991) {
+            e.preventDefault();
+            var parent = this.closest('.sb-has-dropdown');
+            if (parent) {
+              parent.classList.toggle('sb-expanded');
+            }
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupMobileNav);
+    } else {
+      setupMobileNav();
+    }
+  })();
+
+
+  /* ==========================================================================
+     CONTACT & ENQUIRY FORM VALIDATION ENGINE (EMAIL & MOBILE NO)
+     - Live keystroke sanitization & restriction (digits only for phone)
+     - Strict RFC email validation with informative visual feedback
+     - 10-digit Indian Mobile / International mobile validation
+     - Clear inline error messages and visual highlighting
+     - Smooth scrolling to first invalid input on submission
+     ========================================================================== */
+  (function initContactFormValidation() {
+    function setupFormValidation() {
+      var forms = document.querySelectorAll('form[name="static_form"], form[name="products_form"], .contact_full_form form, form.enq-frm');
+
+      forms.forEach(function (form) {
+        var emailInput = form.querySelector('input[name="dynFrm_email_id"], #detail_email_id, input[type="email"]');
+        var phoneInput = form.querySelector('input[name="dynFrm_phone"], #detail_phone, input.mobile-number, input[type="tel"]');
+        var countrySelect = form.querySelector('select[name="dynFrm_country"], #dynFrm_country');
+
+        function getOrCreateErrorSpan(input, defaultClass) {
+          if (!input) return null;
+          var parent = input.closest('.mb17px') || input.parentElement;
+          var span = parent.querySelector('.sb-form-error, span.red');
+          if (!span) {
+            span = document.createElement('span');
+            span.className = defaultClass || 'sb-form-error';
+            parent.appendChild(span);
+          }
+          return span;
+        }
+
+        function setFieldError(input, message) {
+          if (!input) return;
+          input.classList.add('sb-input-error');
+          input.classList.remove('sb-input-success');
+          var errSpan = getOrCreateErrorSpan(input, 'sb-form-error');
+          if (errSpan) {
+            errSpan.className = 'sb-form-error red xsmall';
+            errSpan.textContent = message;
+            errSpan.style.display = 'block';
+          }
+        }
+
+        function clearFieldError(input) {
+          if (!input) return;
+          input.classList.remove('sb-input-error');
+          input.classList.add('sb-input-success');
+          var errSpan = getOrCreateErrorSpan(input, 'sb-form-error');
+          if (errSpan) {
+            errSpan.textContent = '';
+            errSpan.style.display = 'none';
+          }
+        }
+
+        function validateEmail(showError) {
+          if (!emailInput) return true;
+          var val = emailInput.value.trim();
+          var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+
+          if (!val) {
+            if (showError) setFieldError(emailInput, 'Please enter your email address.');
+            return false;
+          }
+          if (!emailRegex.test(val)) {
+            if (showError) setFieldError(emailInput, 'Please enter a valid email address (e.g. name@example.com).');
+            return false;
+          }
+          clearFieldError(emailInput);
+          return true;
+        }
+
+        function validatePhone(showError) {
+          if (!phoneInput) return true;
+          var val = phoneInput.value.trim();
+          var isIndia = true;
+          if (countrySelect && countrySelect.value) {
+            isIndia = countrySelect.value.indexOf('91') !== -1;
+          }
+
+          if (!val) {
+            if (showError) setFieldError(phoneInput, 'Please enter your mobile number.');
+            return false;
+          }
+          if (!/^\d+$/.test(val)) {
+            if (showError) setFieldError(phoneInput, 'Mobile number must contain digits only.');
+            return false;
+          }
+          if (isIndia) {
+            if (val.length !== 10) {
+              if (showError) setFieldError(phoneInput, 'Please enter exactly 10 digits for Indian mobile number.');
+              return false;
+            }
+            if (!/^[6-9]/.test(val)) {
+              if (showError) setFieldError(phoneInput, 'Indian mobile number must start with 6, 7, 8, or 9.');
+              return false;
+            }
+          } else {
+            if (val.length < 6 || val.length > 15) {
+              if (showError) setFieldError(phoneInput, 'Please enter 6 to 15 digits for international number.');
+              return false;
+            }
+          }
+          clearFieldError(phoneInput);
+          return true;
+        }
+
+        // Live Keystroke Filter for Mobile: only allow digits (max 10 for India)
+        if (phoneInput) {
+          phoneInput.setAttribute('inputmode', 'numeric');
+          phoneInput.setAttribute('autocomplete', 'tel');
+          phoneInput.addEventListener('input', function () {
+            var isIndia = true;
+            if (countrySelect && countrySelect.value) {
+              isIndia = countrySelect.value.indexOf('91') !== -1;
+            }
+            var clean = this.value.replace(/\D/g, '');
+            if (isIndia && clean.length > 10) {
+              clean = clean.substring(0, 10);
+            }
+            this.value = clean;
+            if (clean.length === 10 && isIndia) {
+              validatePhone(false);
+            } else if (this.classList.contains('sb-input-error')) {
+              validatePhone(true);
+            }
+          });
+
+          phoneInput.addEventListener('blur', function () {
+            validatePhone(true);
+          });
+        }
+
+        // Live Email Validation on blur and typing
+        if (emailInput) {
+          emailInput.setAttribute('autocomplete', 'email');
+          emailInput.addEventListener('blur', function () {
+            validateEmail(true);
+          });
+          emailInput.addEventListener('input', function () {
+            if (this.classList.contains('sb-input-error')) {
+              validateEmail(false);
+            }
+          });
+        }
+
+        // Intercept Form Submission in capture phase so invalid data is blocked
+        form.addEventListener('submit', function (e) {
+          var isEmailOk = validateEmail(true);
+          var isPhoneOk = validatePhone(true);
+
+          if (!isEmailOk || !isPhoneOk) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var target = !isEmailOk ? emailInput : phoneInput;
+            if (target) {
+              target.focus();
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+          }
+        }, true);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupFormValidation);
+    } else {
+      setupFormValidation();
+    }
+  })();
